@@ -1,14 +1,12 @@
 #cy {
-    position: fixed;
-    top: 7%; /* adjust to position the cy element on the page */
-    right: 50px;
-    bottom: 50px;
-    left: 50px;
-    z-index: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 
 #cy-container {
-    position: relative;
 }
 
 #customize-pane {

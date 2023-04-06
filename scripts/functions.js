@@ -1,50 +1,19 @@
-function createGraph() {
-  var numNodes = parseInt(document.getElementById("numNodes").value);
-  var edgeWeightsStr = document.getElementById("edgeWeights").value;
-  var edgeWeights = edgeWeightsStr.split(",");
-  var numEdges = edgeWeights.length;
-
-  var cy = cytoscape({
-    container: document.getElementById("cy"),
-    elements: {
-      nodes: initNodes(numNodes),
-      edges: initEdges(numEdges, edgeWeights),
-    },
-    style: [
-      {
-        selector: "node",
-        style: {
-          "background-image": "images/web-server-icon.png",
-          "background-fit": "cover",
-          width: "50px",
-          height: "50px",
-          "background-clip": "node",
-          shape: "rectangle",
-          "background-opacity": 0,
-          label: function (ele) {
-            return ele.data("label");
-          },
-          "text-margin-y": "-10px",
-        },
-      },
-      //   {
-      //       selector: 'edge#ab',
-      //       style: {
-      //           'line-color': 'red',
-      //       }
-      //   },
-      {
-        selector: "edge",
-        style: {
-          label: function (ele) {
-            return ele.data("weight");
-          },
-          "text-margin-y": "-20px",
-        },
-      },
-    ],
-  });
-}
+// Default nodes and edges
+var nodes = [
+  { data: { id: "1", label: randomIP() + ', 1' } },
+  { data: { id: "2", label: randomIP() + ', 2' } },
+  { data: { id: "3", label: randomIP() + ', 3' } },
+  { data: { id: "4", label: randomIP() + ', 4' } },
+  { data: { id: "5", label: randomIP() + ', 5' } },
+];
+var edges = [
+  { data: { id: "edge1", source: "1", target: "2", weight: 3 } },
+  { data: { id: "edge2", source: "2", target: "3", weight: 7 } },
+  { data: { id: "edge3", source: "3", target: "5", weight: 1 } },
+  { data: { id: "edge4", source: "4", target: "5", weight: 10 } },
+  { data: { id: "edge5", source: "1", target: "4", weight: 17 } },
+  { data: { id: "edge6", source: "2", target: "4", weight: 13 } },
+];
 
 function randomIP() {
   let ip =
@@ -59,36 +28,72 @@ function randomIP() {
   return ip;
 }
 
-function initEdges(numEdges, edgeWeights) {
-  let edges = [];
-  let edgeIndex = 1;
-
-  for (var i = 1; i <= numEdges; i++) {
-    let sourceNodeIndex = i;
-    let targetNodeIndex = (i % numEdges) + 1;
-    var weight = parseInt(edgeWeights[i - 1]);
-
-    edges.push({
-      data: {
-        id: "e" + edgeIndex,
-        source: "n" + sourceNodeIndex,
-        target: "n" + targetNodeIndex,
-        weight: weight,
+// Init cytoscape
+var cy = cytoscape({
+  container: document.getElementById("cy"),
+  elements: nodes.concat(edges),
+  style: [
+    {
+      selector: "node",
+      style: {
+        "background-image": "images/web-server-icon.png",
+        "background-fit": "cover",
+        width: "50px",
+        height: "50px",
+        "background-clip": "node",
+        shape: "rectangle",
+        "background-opacity": 0,
+        label: function (ele) {
+          return ele.data("label");
+        },
+        "text-margin-y": "-10px",
       },
+    },
+    // {
+    //     selector: 'edge#ab',
+    //     style: {
+    //         'line-color': 'red',
+    //     }
+    // },
+    {
+      selector: "edge",
+      style: {
+        label: function (ele) {
+          return ele.data("weight");
+        },
+        "text-margin-y": "-20px",
+      },
+    },
+  ],
+});
+
+// Customization, add on tap
+cy.on("tap", function (event) {
+  if (event.target === cy) {
+    // Tap on the empty canvas to add a new node
+    var id = (cy.nodes().size() + 1); // Generate a new ID for the node
+    // If the user enters a weight, add the new node to the graph
+    cy.add({
+    data: { id: id, label: randomIP() + `, ${id}` },
+    position: { x: event.position.x, y: event.position.y },
     });
-
-    edgeIndex++;
+  } else if (event.target.isNode()) {
+    // Tap on a node to add a new edge
+    var source = event.target.id();
+    var target = prompt("Enter ID of target node for edge from " + source);
+    var weight = prompt(
+      "Enter weight for edge from " + source + " to " + target
+    );
+    if (target && weight) {
+      // If the user enters a target node and weight, add the new edge to the graph
+      cy.add({
+        data: {
+          id: "edge" + cy.edges().size() + 1,
+          source: source,
+          target: target,
+          weight: weight,
+        },
+      });
+    }
   }
-
-  return edges;
-}
-
-function initNodes(numNodes) {
-  let nodes = [];
-
-  for (var i = 1; i <= numNodes; i++) {
-    nodes.push({ data: { id: "n" + i, label: randomIP() } });
-  }
-
-  return nodes;
-}
+});
