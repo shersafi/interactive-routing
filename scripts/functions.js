@@ -1,10 +1,10 @@
 // Default nodes and edges
 var nodes = [
-  { data: { id: "1", label: randomIP() + ', 1' } },
-  { data: { id: "2", label: randomIP() + ', 2' } },
-  { data: { id: "3", label: randomIP() + ', 3' } },
-  { data: { id: "4", label: randomIP() + ', 4' } },
-  { data: { id: "5", label: randomIP() + ', 5' } },
+  { data: { id: "1", label: randomIP() + ", 1" } },
+  { data: { id: "2", label: randomIP() + ", 2" } },
+  { data: { id: "3", label: randomIP() + ", 3" } },
+  { data: { id: "4", label: randomIP() + ", 4" } },
+  { data: { id: "5", label: randomIP() + ", 5" } },
 ];
 var edges = [
   { data: { id: "edge1", source: "1", target: "2", weight: 3 } },
@@ -15,6 +15,7 @@ var edges = [
   { data: { id: "edge6", source: "2", target: "4", weight: 13 } },
 ];
 
+// Generate a random IP for a given node
 function randomIP() {
   let ip =
     Math.floor(Math.random() * 255) +
@@ -31,6 +32,7 @@ function randomIP() {
 // Init cytoscape
 var cy = cytoscape({
   container: document.getElementById("cy"),
+  // Merge node and edge list
   elements: nodes.concat(edges),
   style: [
     {
@@ -49,11 +51,12 @@ var cy = cytoscape({
         "text-margin-y": "-10px",
       },
     },
+    // This is how we add line colour
     // {
-    //     selector: 'edge#ab',
-    //     style: {
-    //         'line-color': 'red',
-    //     }
+    //   selector: "edge#edge1",
+    //   style: {
+    //     "line-color": "red",
+    //   },
     // },
     {
       selector: "edge",
@@ -71,11 +74,11 @@ var cy = cytoscape({
 cy.on("tap", function (event) {
   if (event.target === cy) {
     // Tap on the empty canvas to add a new node
-    var id = (cy.nodes().size() + 1); // Generate a new ID for the node
+    var id = cy.nodes().size() + 1; // Generate a new ID for the node
     // If the user enters a weight, add the new node to the graph
     cy.add({
-    data: { id: id, label: randomIP() + `, ${id}` },
-    position: { x: event.position.x, y: event.position.y },
+      data: { id: id, label: randomIP() + `, ${id}` },
+      position: { x: event.position.x, y: event.position.y },
     });
   } else if (event.target.isNode()) {
     // Tap on a node to add a new edge
