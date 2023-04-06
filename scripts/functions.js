@@ -74,12 +74,12 @@ var cy = cytoscape({
       },
     },
     // This is how we add line colour
-    // {
-    //   selector: "edge#edge1",
-    //   style: {
-    //     "line-color": "red",
-    //   },
-    // },
+    {
+      selector: "edge#edge1",
+      style: {
+        "line-color": "red",
+      },
+    },
     {
       selector: "edge",
       style: {
@@ -87,7 +87,8 @@ var cy = cytoscape({
           return ele.data("weight");
         },
         'curve-style': 'bezier',
-        "text-margin-y": "-20px",
+        "text-margin-y": '-20px',
+        'text-rotation': 'autorotate'
       },
     },
   ],
@@ -176,7 +177,6 @@ randomize.onclick = function() {
         if (!(source === target) && !isConnected(cy, source, target)) {
             edges.push({ data: { id: 'edge' + i.toString(), source: source.toString(), target: target.toString(), weight: weight } });
         }
-     
     }    
 
     // Reset all edges & nodes
