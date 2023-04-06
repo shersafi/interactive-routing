@@ -1,11 +1,16 @@
+function randomIP() {
+    var ip = (Math.floor(Math.random() * 255) + 1)+"."+(Math.floor(Math.random() * 255))+"."+(Math.floor(Math.random() * 255))+"."+(Math.floor(Math.random() * 255));
+    return ip;
+}
+
 var cy = cytoscape({
     container: document.getElementById('cy'),
     elements: [
-      { data: { id: 'a' } },
-      { data: { id: 'b' } },
-      { data: { id: 'c' } },
-      { data: { id: 'd' } },
-      { data: { id: 'e' } },
+      { data: { id: 'a', label: randomIP() } },
+      { data: { id: 'b', label: randomIP() } },
+      { data: { id: 'c', label: randomIP() } },
+      { data: { id: 'd', label: randomIP() } },
+      { data: { id: 'e', label: randomIP() } },
       { data: { id: 'ab', source: 'a', target: 'b', weight: 3 }},
       { data: { id: 'bc', source: 'b', target: 'c', weight: 7  }},
       { data: { id: 'cd', source: 'c', target: 'e', weight: 1  }},
@@ -23,7 +28,11 @@ var cy = cytoscape({
                   'height': '50px',
                   'background-clip': 'node',
                   'shape': 'rectangle',
-                  'background-opacity': 0
+                  'background-opacity': 0,
+                  'label': function(ele) {
+                    return ele.data('label');
+                  },
+                  'text-margin-y': '-10px'
               }
           },
           {
