@@ -21,11 +21,20 @@
         <div id="options" class="options">
             <h2 class="title">Interactive Routing Demo</h2>
             <br>
-            <a class="text">Reset Layout: </a> <button id="reset-btn">Reset</button>
+            <label id="labels">Reset Layout:</label> <button id="reset-btn">Reset</button>
             <br>
-            <a class="text">Remove: </a> <button id="remove-selected">Remove Selected</button>
+            <label id="labels">Randomize Layout:</label> <button id="randomize">Randomize!</button>
             <br>
-            <a class="text">Select Algorithm: </a>
+            <label id="labels">Remove:</label> <button id="remove-selected">Remove Selected</button>
+            <br>
+            <form>
+                <label id="labels" for="algorithms">Select Routing Algorithm:</label>
+                <select name="algorithms" id="algorithms">
+                    <option value="djikstra">Djikstra's</option>
+                    <option value="poo">poo's</option>
+                </select>
+            </form>
+            
         </div>
         <script src="scripts/functions.js"></script>
     </body>
