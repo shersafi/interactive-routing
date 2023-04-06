@@ -100,3 +100,19 @@ cy.on("tap", function (event) {
     }
   }
 });
+
+// Reset button event listener (click)
+var resetBtn = document.getElementById('reset-btn');
+resetBtn.onclick = function() {
+    // Reset button resets all edges & nodes
+    cy.nodes().remove();
+    cy.edges().remove();
+};
+
+var removeSelected = document.getElementById('remove-selected');
+removeSelected.onclick = function() {
+    var selectedNodes = cy.$('node:selected');
+    var selectedEdges = cy.$('edge:selected');
+    selectedNodes.remove();
+    selectedEdges.remove();
+};
