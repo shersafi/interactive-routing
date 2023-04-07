@@ -38,6 +38,8 @@
     line-height: 2.5;
 }
 
-#start {
 
+#start {
+    position: absolute;
+    left: 30%; /* i know its ghetto */
 }

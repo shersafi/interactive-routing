@@ -1,10 +1,10 @@
 // Default nodes and edges
 var nodes = [
-  { data: { id: "1", label: randomIP() + ", 1" } },
-  { data: { id: "2", label: randomIP() + ", 2" } },
-  { data: { id: "3", label: randomIP() + ", 3" } },
-  { data: { id: "4", label: randomIP() + ", 4" } },
-  { data: { id: "5", label: randomIP() + ", 5" } },
+  { data: { id: "1", labels: [randomIP(), "1"] } },
+  { data: { id: "2", labels: [randomIP(), "2"] } },
+  { data: { id: "3", labels: [randomIP(), "3"] } },
+  { data: { id: "4", labels: [randomIP(), "4"] } },
+  { data: { id: "5", labels: [randomIP(), "5"] } },
 ];
 var edges = [
   { data: { id: "edge1", source: "1", target: "2", weight: 3 } },
@@ -62,24 +62,29 @@ var cy = cytoscape({
       style: {
         "background-image": "images/web-server-icon.png",
         "background-fit": "cover",
+        "color": "blue",
         width: "50px",
         height: "50px",
         "background-clip": "node",
         shape: "rectangle",
         "background-opacity": 0,
+        'text-wrap': 'wrap',
+        'text-max-width': 140, 
+        'text-overflow-wrap': 'anywhere',
         label: function (ele) {
-          return ele.data("label");
+          var labels = ele.data('labels');
+          return labels.join('\n');
         },
         "text-margin-y": "-10px",
       },
     },
     // This is how we add line colour
-    {
-      selector: "edge#edge1",
-      style: {
-        "line-color": "red",
-      },
-    },
+    // {
+    //   selector: "edge#edge1",
+    //   style: {
+    //     "line-color": "red",
+    //   },
+    // },
     {
       selector: "edge",
       style: {
@@ -101,7 +106,7 @@ cy.on("tap", function (event) {
     var id = cy.nodes().size() + 1; // Generate a new ID for the node
     // If the user enters a weight, add the new node to the graph
     cy.add({
-      data: { id: id, label: randomIP() + `, ${id}` },
+      data: { id: id, labels: [randomIP(), `${id}`] },
       position: { x: event.position.x, y: event.position.y },
     });
   } else if (event.target.isNode()) {
@@ -153,7 +158,7 @@ randomize.onclick = function() {
 
     // Generate nodes
     for (var i = 1; i <= numNodes; i++) {
-        nodes.push({ data: { id: i.toString(), label: randomIP() + `, ${i}` } });
+        nodes.push({ data: { id: i.toString(), labels: [randomIP(), `${i}`] } });
     }
 
     // Generate edges
@@ -174,7 +179,7 @@ randomize.onclick = function() {
         var target = Math.floor(Math.random() * numNodes) + 1; // Select random node
         var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
 
-        if (!(source === target) && !isConnected(cy, source, target)) {
+        if ((!(source === target)) && (!isConnected(cy, source, target))) {
             edges.push({ data: { id: 'edge' + i.toString(), source: source.toString(), target: target.toString(), weight: weight } });
         }
     }    
@@ -182,12 +187,18 @@ randomize.onclick = function() {
     // Reset all edges & nodes
     cy.elements().remove();
 
-    console.log(nodes);
-    console.log(edges);
-
     // Add the generated nodes and edges
     cy.add(nodes.concat(edges));
     cy.layout({ name: 'cose', nodeRepulsion: function( node ){ return 2000000; },
     edgeElasticity: function( edge ){ return 1000; } }).run();
 
 };
+
+// Start algorithm
+var start = document.getElementById('start');
+start.onclick = function() {
+    // to-do
+    const start = cy.nodes()[0];
+    
+};
+
