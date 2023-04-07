@@ -31,22 +31,25 @@ function randomIP() {
 
 // Checks if two nodes are connected
 function isConnected(cy, node1, node2) {
-    var node1 = cy.getElementById(node1);
-    var node2 = cy.getElementById(node2);
+  var node1 = cy.getElementById(node1);
+  var node2 = cy.getElementById(node2);
 
-    var edges = node1.connectedEdges();
+  var edges = node1.connectedEdges();
 
-    for (var i = 0; i < edges.length; i++) {
-        var source = edges[i].source();
-        var target = edges[i].target();
+  for (var i = 0; i < edges.length; i++) {
+    var source = edges[i].source();
+    var target = edges[i].target();
 
-        // check if they are connected
-        if ((source === node1 && target === node2) || (source === node2 && target === node1)) {
-            return true;
-        }
+    // check if they are connected
+    if (
+      (source === node1 && target === node2) ||
+      (source === node2 && target === node1)
+    ) {
+      return true;
     }
+  }
 
-    return false;
+  return false;
 }
 
 // Init cytoscape
@@ -54,46 +57,46 @@ var cy = cytoscape({
   container: document.getElementById("cy"),
   // Merge node and edge list
   elements: nodes.concat(edges),
-  layout: { name: 'cose', nodeRepulsion: function( node ){ return 3000000; },
-  edgeElasticity: function( edge ){ return 1000; } },
+  layout: {
+    name: "cose",
+    nodeRepulsion: function (node) {
+      return 3000000;
+    },
+    edgeElasticity: function (edge) {
+      return 1000;
+    },
+  },
   style: [
     {
       selector: "node",
       style: {
         "background-image": "images/web-server-icon.png",
         "background-fit": "cover",
-        "color": "blue",
+        color: "blue",
         width: "50px",
         height: "50px",
         "background-clip": "node",
         shape: "rectangle",
         "background-opacity": 0,
-        'text-wrap': 'wrap',
-        'text-max-width': 140, 
-        'text-overflow-wrap': 'anywhere',
+        "text-wrap": "wrap",
+        "text-max-width": 140,
+        "text-overflow-wrap": "anywhere",
         label: function (ele) {
-          var labels = ele.data('labels');
-          return labels.join('\n');
+          var labels = ele.data("labels");
+          return labels.join("\n");
         },
         "text-margin-y": "-10px",
       },
     },
-    // This is how we add line colour
-    // {
-    //   selector: "edge#edge1",
-    //   style: {
-    //     "line-color": "red",
-    //   },
-    // },
     {
       selector: "edge",
       style: {
         label: function (ele) {
           return ele.data("weight");
         },
-        'curve-style': 'bezier',
-        "text-margin-y": '-20px',
-        'text-rotation': 'autorotate'
+        "curve-style": "bezier",
+        "text-margin-y": "-20px",
+        "text-rotation": "autorotate",
       },
     },
   ],
@@ -131,74 +134,123 @@ cy.on("tap", function (event) {
 });
 
 // Reset button event listener (click)
-var reset = document.getElementById('reset-btn');
-reset.onclick = function() {
-    // Reset button resets all edges & nodes
-    cy.elements().remove();
+var reset = document.getElementById("reset-btn");
+reset.onclick = function () {
+  // Reset button resets all edges & nodes
+  cy.elements().remove();
 };
 
 // Remove selected edges/nodes listener (click)
-var removeSelected = document.getElementById('remove-selected');
-removeSelected.onclick = function() {
-    // Remove selected button removes every selected node/edge
-    var selectedNodes = cy.$('node:selected');
-    var selectedEdges = cy.$('edge:selected');
-    selectedNodes.remove();
-    selectedEdges.remove();
+var removeSelected = document.getElementById("remove-selected");
+removeSelected.onclick = function () {
+  // Remove selected button removes every selected node/edge
+  var selectedNodes = cy.$("node:selected");
+  var selectedEdges = cy.$("edge:selected");
+  selectedNodes.remove();
+  selectedEdges.remove();
 };
 
-var randomize = document.getElementById('randomize');
-randomize.onclick = function() {
-    // Randomize a layout with nodes and edges (connected graph)
-    var numNodes = Math.floor(Math.random() * 9) + 4; // Random nodeNum between [4, 12]
-    
-    // Nodes and edges to append
-    var nodes = [];
-    var edges = [];
+var randomize = document.getElementById("randomize");
+randomize.onclick = function () {
+  // Randomize a layout with nodes and edges (connected graph)
+  var numNodes = Math.floor(Math.random() * 9) + 4; // Random nodeNum between [4, 12]
 
-    // Generate nodes
-    for (var i = 1; i <= numNodes; i++) {
-        nodes.push({ data: { id: i.toString(), labels: [randomIP(), `${i}`] } });
-    }
+  // Nodes and edges to append
+  var nodes = [];
+  var edges = [];
 
-    // Generate edges
-    for (var i = 1; i <= numNodes - 1; i++) {
-        var source = i;
-        var target = i + 1;
-        var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
-        edges.push({ data: { id: 'edge' + i.toString(), source: source.toString(), target: target.toString(), weight: weight } });
-    }
+  // Generate nodes
+  for (var i = 1; i <= numNodes; i++) {
+    nodes.push({ data: { id: i.toString(), labels: [randomIP(), `${i}`] } });
+  }
 
+  // Generate edges
+  for (var i = 1; i <= numNodes - 1; i++) {
+    var source = i;
+    var target = i + 1;
     var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
-    // Connect to first
-    edges.push({ data: { id: 'edge' + numNodes, source: numNodes.toString(), target: '1', weight: weight } });
-    
-    // Select random nodes to add random edges to
-    for (var i = 1; i <= (numNodes - 1)*2; i++) {
-        var source = Math.floor(Math.random() * numNodes) + 1; // Select random node
-        var target = Math.floor(Math.random() * numNodes) + 1; // Select random node
-        var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
+    edges.push({
+      data: {
+        id: "edge" + i.toString(),
+        source: source.toString(),
+        target: target.toString(),
+        weight: weight,
+      },
+    });
+  }
 
-        if ((!(source === target)) && (!isConnected(cy, source, target))) {
-            edges.push({ data: { id: 'edge' + i.toString(), source: source.toString(), target: target.toString(), weight: weight } });
-        }
-    }    
+  var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
+  // Connect to first
+  edges.push({
+    data: {
+      id: "edge" + numNodes,
+      source: numNodes.toString(),
+      target: "1",
+      weight: weight,
+    },
+  });
 
-    // Reset all edges & nodes
-    cy.elements().remove();
+  // Select random nodes to add random edges to
+  for (var i = 1; i <= (numNodes - 1) * 2; i++) {
+    var source = Math.floor(Math.random() * numNodes) + 1; // Select random node
+    var target = Math.floor(Math.random() * numNodes) + 1; // Select random node
+    var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
 
-    // Add the generated nodes and edges
-    cy.add(nodes.concat(edges));
-    cy.layout({ name: 'cose', nodeRepulsion: function( node ){ return 2000000; },
-    edgeElasticity: function( edge ){ return 1000; } }).run();
+    if (!(source === target) && !isConnected(cy, source, target)) {
+      edges.push({
+        data: {
+          id: "edge" + i.toString(),
+          source: source.toString(),
+          target: target.toString(),
+          weight: weight,
+        },
+      });
+    }
+  }
 
+  // Reset all edges & nodes
+  cy.elements().remove();
+
+  // Add the generated nodes and edges
+  cy.add(nodes.concat(edges));
+  cy.layout({
+    name: "cose",
+    nodeRepulsion: function (node) {
+      return 2000000;
+    },
+    edgeElasticity: function (edge) {
+      return 1000;
+    },
+  }).run();
 };
 
 // Start algorithm
-var start = document.getElementById('start');
-start.onclick = function() {
-    // to-do
-    const start = cy.nodes()[0];
-    
+var start = document.getElementById("start");
+start.onclick = function () {
+  // to-do
+  const start = cy.nodes()[0];
+  const end = cy.nodes().last();
+
+  djikstra(start, end);
 };
 
+function djikstra(start, end) {
+    // init distance vector
+    distance = {};
+    // init visited vector
+    visited = {};
+
+    // add distance and visited for each node
+    cy.nodes().forEach(function(node) {
+        // add distance
+        distance[node.id()] = Infinity;
+        // label initial distance infinity to nodes
+        var labels = node.data('labels'); // grab pre-existing labels
+        if (labels[labels.length - 1] !== '∞') {
+            labels.push('∞');
+        }
+        node.data('labels', labels);
+
+        
+    })
+}
