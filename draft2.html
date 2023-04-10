@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+ 
+  <style>
+    #cy {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="cy"></div>
+  <script>
+   
+var nodes = [
+  { data: { id: 'a' } },
+  { data: { id: 'b' } },
+  { data: { id: 'c' } },
+  { data: { id: 'd' } },
+  { data: { id: 'e' } }
+];
+var edges = [
+  { data: { source: 'a', target: 'b', weight: 2 } },
+  { data: { source: 'a', target: 'c', weight: 1 } },
+  { data: { source: 'b', target: 'd', weight: 3 } },
+  { data: { source: 'b', target: 'c', weight: 1 } },
+  { data: { source: 'c', target: 'd', weight: 1 } },
+  { data: { source: 'c', target: 'e', weight: 2 } },
+  { data: { source: 'd', target: 'e', weight: 1 } }
+];
+
+
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+  elements: {
+    nodes: nodes,
+    edges: edges
+  },
+  style: [
+    {
+      selector: 'node',
+      style: {
+        'label': 'data(id)'
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        'label': 'data(weight)',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle'
+      }
+    }
+  ]
+});
+
+
+function dijkstra(startNode, endNode) {
+  var unvisitedNodes = cy.nodes();
+  var distances = {};
+  var previous = {};
+
+  unvisitedNodes.forEach(function(node) {
+    distances[node.id()] = Infinity;
+    previous[node.id()] = null;
+  });
+
+  distances[startNode.id()] = 0;
+
+  while (unvisitedNodes.length > 0) {
+    var currentNode = getClosestNode(unvisitedNodes, distances);
+    if (currentNode.id() === endNode.id()) {
+      return getPath(previous, endNode);
+    }
+
+    currentNode.successors().forEach(function(neighborNode) {
+      var distance = distances[currentNode.id()] + getDistance(currentNode, neighborNode);
+      if (distance < distances[neighborNode.id()]) {
+        distances[neighborNode.id()] = distance;
+        previous[neighborNode.id()] = currentNode;
+      }
+    });
+
+    unvisitedNodes = unvisitedNodes.filter(function(node) {
+      return node.id() !== currentNode.id();
+    });
+  }
+
+  return null;
+}
+
+
+function getClosestNode(nodes, distances) {
+var closestNode = null;
+var closestDistance = Infinity;
+
+nodes.forEach(function(node) {
+if (distances[node.id()] < closestDistance) {
+closestNode = node;
+closestDistance = distances[node.id()];
+}
+});
+
+return closestNode;
+}
+
+function getDistance(node1, node2) {
+  var edge = node1.edgesTo(node2)[0];
+  if (edge) {
+    return edge.data('weight');
+  } else {
+    return Infinity; 
+  }
+}
+
+
+function getPath(previous, endNode) {
+var path = [];
+var currentNode = endNode;
+
+while (currentNode !== null) {
+path.unshift(currentNode);
+currentNode = previous[currentNode.id()];
+}
+
+return path;
+}
+
+
+var startNode = cy.$('#b');
+var endNode = cy.$('#d');
+
+var path = dijkstra(startNode, endNode);
+
+if (path !== null) {
+var i = 0;
+
+var intervalId = setInterval(function() {
+if (i < path.length) {
+var node = path[i];
+node.addClass('visited');
+if (i > 0) {
+    var edge = path[i-1].edgesTo(node)[0];
+    edge.addClass('visited');
+  }
+
+  cy.animate({
+    fit: {
+      eles: node.union(node.neighborhood()),
+      padding: 50
+    }
+  }, {
+    duration: 500
+  });
+
+  i++;
+} else {
+  clearInterval(intervalId);
+}
+}, 1000);
+} else {
+alert('No path found!');
+}
+
+
+cy.style().selector('.visited').style({
+'background-color': '#ff7f0e',
+'line-color': '#ff7f0e'
+}).update();
+
+  </script>
+</body>
+</html>
