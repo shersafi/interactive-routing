@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="btn_run_algorithm">Run Algorithm</button>
+    <script>
+      window.addEventListener('load', () => {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const start = 'A';
+        const end = 'F';
+        const nodes = ['A', 'B', 'C', 'D', 'E', 'F'];
+        const edges = [
+          {from: 'A', to: 'B', cost: 3},
+          {from: 'A', to: 'C', cost: 1},
+          {from: 'A', to: 'D', cost: 2},
+          {from: 'B', to: 'F', cost: 7},
+          {from: 'C', to: 'B', cost: 1},
+          {from: 'C', to: 'E', cost: 5},
+          {from: 'C', to: 'D', cost: 2},
+          {from: 'D', to: 'E', cost: 4},
+          {from: 'E', to: 'F', cost: 2}
+        ];
+        const distances = {};
+        const parents = {};
+        const queue = [];
+
+        function initDistances() {
+          for (let i = 0; i < nodes.length; i++) {
+            distances[nodes[i]] = Infinity;
+            parents[nodes[i]] = null;
+          }
+          distances[start] = 0;
+        }
+
+        function enqueue(node) {
+          queue.push(node);
+          queue.sort((a, b) => distances[a] - distances[b]);
+        }
+
+        function runAlgorithm() {
+  initDistances();
+  enqueue(start);
+
+  const animationDelay = 1000;
+  let i = 0;
+
+  const timer = setInterval(() => {
+    if (queue.length === 0) {
+      clearInterval(timer);
+      showOptimalPath();
+      return;
+    }
+
+    const node = queue.shift();
+    if (node === end) {
+      clearInterval(timer);
+      showOptimalPath();
+      return;
+    }
+
+    for (let j = 0; j < edges.length; j++) {
+      const edge = edges[j];
+      if (edge.from === node) {
+        const neighbor = edge.to;
+        const cost = edge.cost;
+        const alt = distances[node] + cost;
+        if (alt < distances[neighbor]) {
+          distances[neighbor] = alt;
+          parents[neighbor] = node;
+          enqueue(neighbor);
+          drawEdge(node, neighbor, 'orange');
+        }
+      }
+    }
+
+    drawNode(node, 'green');
+    i++;
+  }, animationDelay);
+}
+drawGraph();
+
+        function showOptimalPath() {
+          let node = end;
+          while (node !== start) {
+            drawEdge(parents[node], node, 'blue');
+            node = parents[node];
+          }
+        }
+        function drawGraph() {
+
+  for (let i = 0; i < nodes.length; i++) {
+    drawNode(nodes[i], 'blue');
+  }
+
+  
+  for (let i = 0; i < edges.length; i++) {
+    const edge = edges[i];
+    drawEdge(edge.from, edge.to, 'blue');
+  }
+}
+
+function drawNode(node, color) {
+  const pos = getNodePosition(node);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.closePath();
+  ctx.fillStyle = 'white';
+  ctx.font = '16px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(node, pos.x, pos.y + 5);
+}
+function drawEdge(fromNode, toNode, color) {
+  const startPos = getNodePosition(fromNode);
+  const endPos = getNodePosition(toNode);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(startPos.x, startPos.y);
+  ctx.lineTo(endPos.x, endPos.y);
+  ctx.stroke();
+}
+
+    function getNodePosition(node) {
+      switch (node) {
+        case 'A':
+          return {x: 100, y: 200};
+        case 'B':
+          return {x: 300, y: 100};
+        case 'C':
+          return {x: 300, y: 300};
+        case 'D':
+          return {x: 500, y: 200};
+        case 'E':
+          return {x: 600, y: 400};
+        case 'F':
+          return {x: 700, y: 100};
+      }
+    }
+
+    document.getElementById('btn_run_algorithm').addEventListener('click', () => {
+      runAlgorithm();
+    });
+  });
+</script>
+</body>
+</html>
