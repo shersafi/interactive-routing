@@ -128,9 +128,6 @@ removeSelected.onclick = function () {
     selectedEdges.remove();
 };
 
-var randomize = document.getElementById("randomize");
-
-
 // function onRandomize() {
 //     cy.startBatch()
 
@@ -152,79 +149,101 @@ var randomize = document.getElementById("randomize");
 //     cy.endBatch()
 // }
 
+// Checks if two nodes are connected
+function isConnected(cy, node1, node2) {
+    var node1 = cy.getElementById(node1);
+    var node2 = cy.getElementById(node2);
+  
+    var edges = node1.connectedEdges();
+  
+    for (var i = 0; i < edges.length; i++) {
+      var source = edges[i].source();
+      var target = edges[i].target();
+  
+      // check if they are connected
+      if (
+        (source === node1 && target === node2) ||
+        (source === node2 && target === node1)
+      ) {
+        return true;
+      }
+    }
+  
+    return false;
+  }
 
-
+var randomize = document.getElementById("randomize");
 randomize.onclick = function () {
-    // Randomize a layout with nodes and edges (connected graph)
-    var numNodes = Math.floor(Math.random() * 9) + 4; // Random nodeNum between [4, 12]
+  // Randomize a layout with nodes and edges (connected graph)
+  var numNodes = Math.floor(Math.random() * 9) + 4; // Random nodeNum between [4, 12]
 
-    // Nodes and edges to append
-    var nodes = [];
-    var edges = [];
+  // Nodes and edges to append
+  var nodes = [];
+  var edges = [];
 
-    // Generate nodes
-    for (var i = 1; i <= numNodes; i++) {
-        nodes.push({ data: { id: i.toString(), labels: [randomIP(), `${i}`] } });
-    }
+  // Generate nodes
+  for (var i = 1; i <= numNodes; i++) {
+    nodes.push({ data: { id: i.toString(), labels: [randomIP(), `${i}`] } });
+  }
 
-    // Generate edges
-    for (var i = 1; i <= numNodes - 1; i++) {
-        var source = i;
-        var target = i + 1;
-        var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
-        edges.push({
-            data: {
-                id: "edge" + i.toString(),
-                source: source.toString(),
-                target: target.toString(),
-                weight: weight,
-            },
-        });
-    }
-
+  // Generate edges
+  for (var i = 1; i <= numNodes - 1; i++) {
+    var source = i;
+    var target = i + 1;
     var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
-    // Connect to first
     edges.push({
-        data: {
-            id: "edge" + numNodes,
-            source: numNodes.toString(),
-            target: "1",
-            weight: weight,
-        },
+      data: {
+        id: "edge" + i.toString(),
+        source: source.toString(),
+        target: target.toString(),
+        weight: weight,
+      },
     });
+  }
 
-    // Select random nodes to add random edges to
-    for (var i = 1; i <= (numNodes - 1) * 2; i++) {
-        var source = Math.floor(Math.random() * numNodes) + 1; // Select random node
-        var target = Math.floor(Math.random() * numNodes) + 1; // Select random node
-        var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
+  var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
+  // Connect to first
+  edges.push({
+    data: {
+      id: "edge" + numNodes,
+      source: numNodes.toString(),
+      target: "1",
+      weight: weight,
+    },
+  });
 
-        if (!(source === target) && !isConnected(cy, source, target)) {
-            edges.push({
-                data: {
-                    id: "edge" + i.toString(),
-                    source: source.toString(),
-                    target: target.toString(),
-                    weight: weight,
-                },
-            });
-        }
+  // Select random nodes to add random edges to
+  for (var i = 1; i <= (numNodes - 1) * 2; i++) {
+    var source = Math.floor(Math.random() * numNodes) + 1; // Select random node
+    var target = Math.floor(Math.random() * numNodes) + 1; // Select random node
+    var weight = Math.floor(Math.random() * 20) + 1; // Random weight between [1, 20]
+
+    if (!(source === target) && !isConnected(cy, source, target)) {
+      edges.push({
+        data: {
+          id: "edge" + i.toString(),
+          source: source.toString(),
+          target: target.toString(),
+          weight: weight,
+        },
+      });
     }
+  }
 
-    // Reset all edges & nodes
-    cy.elements().remove();
+  // Reset all edges & nodes
+  cy.elements().remove();
 
-    // Add the generated nodes and edges
-    cy.add(nodes.concat(edges));
-    cy.layout({
-        name: "cose",
-        nodeRepulsion: function (node) {
-            return 2000000;
-        },
-        edgeElasticity: function (edge) {
-            return 1000;
-        },
-    }).run();
+  // Add the generated nodes and edges
+  cy.add(nodes.concat(edges));
+  cy.layout({
+    name: "cose",
+    nodeRepulsion: function (node) {
+      return 2000000;
+    },
+    edgeElasticity: function (edge) {
+      return 1000;
+    },
+  }).run();
 };
 
 // Start algorithm
@@ -253,7 +272,5 @@ function djikstra(start, end) {
             labels.push('∞');
         }
         node.data('labels', labels);
-
-
     })
 }
