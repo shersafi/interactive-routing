@@ -5,14 +5,19 @@ var nodes = [
     { data: { id: "3", labels: [randomIP(), "3"] } },
     { data: { id: "4", labels: [randomIP(), "4"] } },
     { data: { id: "5", labels: [randomIP(), "5"] } },
+    { data: { id: "6", labels: [randomIP(), "6"] } },
 ];
 var edges = [
-    { data: { id: "edge1", source: "1", target: "2", weight: 3 } },
-    { data: { id: "edge2", source: "2", target: "3", weight: 7 } },
-    { data: { id: "edge3", source: "3", target: "5", weight: 1 } },
-    { data: { id: "edge4", source: "4", target: "5", weight: 10 } },
-    { data: { id: "edge5", source: "1", target: "4", weight: 17 } },
-    { data: { id: "edge6", source: "2", target: "4", weight: 13 } },
+    { data: { id: "edge1", source: "1", target: "2", weight: 2 } },
+    { data: { id: "edge2", source: "1", target: "3", weight: 1 } },
+    { data: { id: "edge3", source: "1", target: "4", weight: 5 } },
+    { data: { id: "edge4", source: "2", target: "3", weight: 2 } },
+    { data: { id: "edge5", source: "3", target: "5", weight: 1 } },
+    { data: { id: "edge6", source: "4", target: "5", weight: 1 } }, 
+    { data: { id: "edge7", source: "4", target: "6", weight: 5 } },
+    { data: { id: "edge8", source: "5", target: "6", weight: 2 } },
+    { data: { id: "edge9", source: "2", target: "4", weight: 3 } },
+    { data: { id: "edge10", source: "3", target: "4", weight: 3 } },
 ];
 
 // Generate a random IP for a given node
@@ -55,7 +60,7 @@ var cy = cytoscape({
                 height: "50px",
                 "background-clip": "node",
                 shape: "rectangle",
-                "background-opacity": 0,
+                "background-color": "white",
                 "text-wrap": "wrap",
                 "text-max-width": 140,
                 "text-overflow-wrap": "anywhere",
@@ -170,7 +175,9 @@ function isConnected(cy, node1, node2) {
     }
   
     return false;
+
   }
+
 
 var randomize = document.getElementById("randomize");
 randomize.onclick = function () {
@@ -255,22 +262,88 @@ start.onclick = function () {
 
     djikstra(start, end);
 };
+const queue = [];
+const distances = {};
+const previousNodes = {};
 
-function djikstra(start, end) {
-    // init distance vector
-    distance = {};
-    // init visited vector
-    visited = {};
+function enqueue(node) {
+    queue.push(node);
+    queue.sort((a, b) => distances[a] - distances[b]);
+}
 
-    // add distance and visited for each node
-    cy.nodes().forEach(function (node) {
-        // add distance
-        distance[node.id()] = Infinity;
-        // label initial distance infinity to nodes
-        var labels = node.data('labels'); // grab pre-existing labels
-        if (labels[labels.length - 1] !== '∞') {
-            labels.push('∞');
+function djikstra(startNode) {
+    // Set initial distances and previous nodes
+   
+    cy.nodes().forEach(function(node) {
+      distances[node.id()] = Infinity;
+      previousNodes[node.id()] = null;
+    });
+    distances[startNode.id()] = 0;
+
+    
+    // Create a priority queue
+    //var queue = new PriorityQueue({ comparator: function(a, b) { return distances[a] - distances[b]; } });
+    //queue.enqueue(startNode.id());
+    enqueue(startNode.id());
+  
+    //console.log(cy.nodes()[3].neighborhood().nodes().length);
+    //console.log(queue);
+  
+    // Loop until the queue is empty
+    while (!(queue.length == 0)) {
+      // Get the node with the smallest distance
+      var currentNode = cy.nodes('[id="' + queue.shift() + '"]');
+      currentNode.style('background-color', 'red');
+
+     
+  
+      // Get the neighbors of the current node
+      var neighborNodes = currentNode.neighborhood().nodes();
+
+    //   neighborNodes.forEach(function(neighborNode) {
+    //     console.log(neighborNode.id());
+    //   });
+
+
+      // Loop through the neighbors
+      neighborNodes.forEach(function(neighborNode) {
+        var edge = currentNode.edgesWith(neighborNode);
+        var distance = edge.data('weight') + distances[currentNode.id()];
+        // console.log(distances[currentNode.id()]);
+      
+        if (distance < distances[neighborNode.id()]) {
+          distances[neighborNode.id()] = distance;
+          previousNodes[neighborNode.id()] = currentNode.id();
+          //console.log(currentNode.id().toString());
+          enqueue(neighborNode.id());
+           // edge.style('line-color', 'blue');
         }
-        node.data('labels', labels);
-    })
+
+      });
+
+      // console.log(previousNodes);
+      // console.log(distances);
+
+    }
+  
+    // Color the minimum path edges
+   // Loop through previousNodes dictionary
+console.log(previousNodes);
+Object.keys(previousNodes).forEach(function(nodeId) {
+    var previousNodeId = previousNodes[nodeId];
+    if (previousNodeId !== null) {
+      // Get the edge connecting the node with its previous node
+      var edge = cy.edges('[source="' + previousNodeId + '"][target="' + nodeId + '"]');
+      if (edge.length === 0) {
+        edge = cy.edges('[source="' + nodeId + '"][target="' + previousNodeId + '"]');
+      }
+      // Apply a style to color the edge
+      edge.style('line-color', 'green');
+    }
+  });
+    
+    // Update the distance labels
+    cy.nodes().forEach(function(node) {
+      node.style('label', distances[node.id()]);
+    });
 }
