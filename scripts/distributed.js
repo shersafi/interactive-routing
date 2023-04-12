@@ -1,7 +1,11 @@
 
-cy.nodes().on("dvUpdate", dvUpdate)
+function onCalculateDvs() {
+    dvStart()
+}
 
-function dvStart(cy) {
+function dvStart() {
+    cy.nodes().removeListener("dvUpdate", dvUpdate)
+    cy.nodes().on("dvUpdate", dvUpdate)
     dvShare(cy)
 }
 
@@ -13,20 +17,21 @@ function dvShare(cy) {
         })
         dv[node.id()] = 0
         node.data("dv", dv)
+        updateLabel(node)
+        animateUpdate(node)
     })
 
     cy.nodes().forEach(node => {
         node.connectedEdges().forEach(edge => {
             let node2 = otherNode(node, edge)
 
-            node2.emit("dvUpdate", [node.id(), node.data("dv")])
+            //node2.emit("dvUpdate", [node.id(), node.data("dv")])
 
-
-            // setTimeout(
-            //     (n, id, dv) => n.emit("dvUpdate", [id, dv]),
-            //     edge.data("weight") * 100,
-            //     node2, node.id(), node.data("dv")
-            // )
+            setTimeout(
+                (n, id, dv) => n.emit("dvUpdate", [id, dv]),
+                edge.data("weight") * 200,
+                node2, node.id(), node.data("dv")
+            )
         })
     })
 }
@@ -51,32 +56,43 @@ function dvUpdate({target: to}, newId, newDv) {
         let oldValue = (selfDv[nodeId] ?? Infinity)
 
         if (newValue < oldValue) {
-            console.log(newValue, "<", oldValue, "for key", nodeId)
             selfDv[nodeId] = newValue
             updated = true
         }
     }
 
-    to.data("dv", selfDv)
-    updateLabel(to)
-
     if (updated) {
-        console.log("doing this for some reason????")
+        to.data("dv", selfDv)
+        updateLabel(to)
+        animateUpdate(to)
+        
         to.connectedEdges().forEach(edge => {
             let node2 = otherNode(to, edge)
 
-            node2.emit("dvUpdate", [to.id(), to.data("dv")])
+            //node2.emit("dvUpdate", [to.id(), to.data("dv")])
 
-            // setTimeout(
-            //     (n, id, dv) => n.emit("dvUpdate", [id, dv]),
-            //     edge.data("weight") * 100,
-            //     node2, to.id(), to.data("dv")
-            // )
+            setTimeout(
+                (n, id, dv) => n.emit("dvUpdate", [id, dv]),
+                edge.data("weight") * 200,
+                node2, to.id(), to.data("dv")
+            )
         })
     }
     
 }
 
 function updateLabel(node) {
-    node.data("labels", [`id: ${node.id()}`].concat(Object.entries(node.data("dv")).map(([k, v]) => `${k}: ${v}`)) )
+    node.data("labels", [`IP: ${node.data("ip")}`, `ID: ${node.id()}`, `Distance Vector:`].concat(Object.entries(node.data("dv")).map(([k, v]) => `${k}: ${v}`)) )
+}
+
+function animateUpdate(node) {
+    node.animate({
+        style: { "background-color": "red" }
+      }, {
+        duration: 100,
+        complete: function(){
+          node.style("background-color", "white")
+        },
+        queue: false
+      })
 }

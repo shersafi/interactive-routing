@@ -187,8 +187,9 @@ randomize.onclick = function () {
 
   // Generate nodes
   for (var i = 1; i <= numNodes; i++) {
+    let ip = randomIP()
     nodes.push({
-      data: { id: i.toString(), labels: ["IP: " + randomIP(), `ID: ${i}`] },
+      data: { id: i.toString(), ip: ip, labels: ["IP: " + ip, `ID: ${i}`] },
     });
   }
 

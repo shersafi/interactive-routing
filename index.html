@@ -26,7 +26,7 @@
             <br>
             <label id="labels">Reset Layout:</label> <button id="reset-btn">Reset</button>
             <br>
-            <label id="labels">Randomize Layout:</label> <button id="randomize">Randomize!</button>
+            <label id="labels">Randomize Layout:</label> <button onclick="onRandomize()" id="randomize">Randomize!</button>
             <br>
             <label id="labels">Remove:</label> <button id="remove-selected">Remove Selected</button>
             <br>
@@ -40,6 +40,11 @@
             <br>
             <br>
             <button id="start">Start Algorithm!</button>
+
+            <br>
+            <br>
+
+            <button onclick="onCalculateDvs()">Calculate Distance Vectors</button>
             
         </div>
         <script src="scripts/functions.js"></script>
