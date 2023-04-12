@@ -1,11 +1,11 @@
 // Default nodes and edges
 var nodes = [
-    { data: { id: "1", labels: [randomIP(), "1"] } },
-    { data: { id: "2", labels: [randomIP(), "2"] } },
-    { data: { id: "3", labels: [randomIP(), "3"] } },
-    { data: { id: "4", labels: [randomIP(), "4"] } },
-    { data: { id: "5", labels: [randomIP(), "5"] } },
-    { data: { id: "6", labels: [randomIP(), "6"] } },
+    { data: { id: "1", labels: ["IP: " + randomIP(), "ID: 1"] } },
+    { data: { id: "2", labels: ["IP: " + randomIP(), "ID: 2"] } },
+    { data: { id: "3", labels: ["IP: " + randomIP(), "ID: 3"] } },
+    { data: { id: "4", labels: ["IP: " + randomIP(), "ID: 4"] } },
+    { data: { id: "5", labels: ["IP: " + randomIP(), "ID: 5"] } },
+    { data: { id: "6", labels: ["IP: " + randomIP(), "ID: 6"] } },
 ];
 var edges = [
     { data: { id: "edge1", source: "1", target: "2", weight: 2 } },
@@ -13,7 +13,7 @@ var edges = [
     { data: { id: "edge3", source: "1", target: "4", weight: 5 } },
     { data: { id: "edge4", source: "2", target: "3", weight: 2 } },
     { data: { id: "edge5", source: "3", target: "5", weight: 1 } },
-    { data: { id: "edge6", source: "4", target: "5", weight: 1 } }, 
+    { data: { id: "edge6", source: "5", target: "4", weight: 1 } }, 
     { data: { id: "edge7", source: "4", target: "6", weight: 5 } },
     { data: { id: "edge8", source: "5", target: "6", weight: 2 } },
     { data: { id: "edge9", source: "2", target: "4", weight: 3 } },
@@ -41,7 +41,7 @@ var cy = cytoscape({
     // Merge node and edge list
     elements: nodes.concat(edges),
     layout: {
-        name: "cose",
+        name: "grid",
         nodeRepulsion: function (node) {
             return 3000000;
         },
@@ -92,7 +92,7 @@ cy.on("tap", function (event) {
         var id = cy.nodes().size() + 1; // Generate a new ID for the node
         // If the user enters a weight, add the new node to the graph
         cy.add({
-            data: { id: id, labels: [randomIP(), `${id}`] },
+            data: { id: id, labels: ["IP: " + randomIP(), `ID: ${id}`] },
             position: { x: event.position.x, y: event.position.y },
         });
     } else if (event.target.isNode()) {
@@ -190,7 +190,7 @@ randomize.onclick = function () {
 
   // Generate nodes
   for (var i = 1; i <= numNodes; i++) {
-    nodes.push({ data: { id: i.toString(), labels: [randomIP(), `${i}`] } });
+    nodes.push({ data: { id: i.toString(), labels: ["IP: " + randomIP(), `ID: ${i}`] } });
   }
 
   // Generate edges
@@ -243,7 +243,7 @@ randomize.onclick = function () {
   // Add the generated nodes and edges
   cy.add(nodes.concat(edges));
   cy.layout({
-    name: "cose",
+    name: "grid",
     nodeRepulsion: function (node) {
       return 2000000;
     },
@@ -295,8 +295,6 @@ function djikstra(startNode) {
       var currentNode = cy.nodes('[id="' + queue.shift() + '"]');
       currentNode.style('background-color', 'red');
 
-     
-  
       // Get the neighbors of the current node
       var neighborNodes = currentNode.neighborhood().nodes();
 
@@ -339,11 +337,21 @@ Object.keys(previousNodes).forEach(function(nodeId) {
       }
       // Apply a style to color the edge
       edge.style('line-color', 'green');
+      edge.style('arrow-direction', 'backward');
+      edge.style('target-arrow-shape', 'triangle');
+      edge.style('target-arrow-color', 'green');
     }
   });
     
     // Update the distance labels
     cy.nodes().forEach(function(node) {
-      node.style('label', distances[node.id()]);
+      // grab curr labels
+      var labels = node.data('labels');
+      
+      if (!labels[labels.length - 1].includes('Distance:')) {
+        labels.push('Distance: ' + distances[node.id()])
+        node.data('labels', labels);
+      }
+      
     });
 }
