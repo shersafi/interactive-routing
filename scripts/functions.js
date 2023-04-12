@@ -34,7 +34,6 @@ function randomIP() {
     return ip;
 }
 
-// cytoscape.use(avsdf);
 
 // Init cytoscape
 var cy = cytoscape({
@@ -54,9 +53,11 @@ var cy = cytoscape({
             style: {
                 "background-image": "images/web-server-icon.png",
                 "background-fit": "cover",
-                color: "blue",
+                color: "black",
                 width: "50px",
                 height: "50px",
+                'text-outline-color': 'yellow',
+                'text-outline-width': '4px',
                 "background-clip": "node",
                 shape: "roundrectangle",
                 "background-color": "white",
@@ -283,22 +284,23 @@ async function djikstra(startNode) {
     cy.nodes().forEach(function(node) {
         // grab curr labels
         var labels = node.data('labels');
-        
+
         if (!labels[labels.length - 1].includes('Distance:')) {
-          labels.push('Distance: ' + distances[node.id()])
-          node.data('labels', labels);
+            if (node.id() === startNode.id()) {
+                labels.push('Distance: 0');
+                node.data('labels', labels);
+            } else { 
+                labels.push('Distance: ∞');
+                node.data('labels', labels);
+                
+            }
         }
         
+
+        
+        
     });
-
-    // // sleep
-    // await sleep(1000); // 1 second sleep
-
-
     
-    // Create a priority queue
-    //var queue = new PriorityQueue({ comparator: function(a, b) { return distances[a] - distances[b]; } });
-    //queue.enqueue(startNode.id());
     enqueue(startNode.id());
   
     //console.log(cy.nodes()[3].neighborhood().nodes().length);
@@ -316,7 +318,7 @@ async function djikstra(startNode) {
       });
       
      // sleep
-     await sleep(1000); // 1 second sleep
+     await sleep(1500); // 1.5 second sleep
 
 
       // Get the neighbors of the current node
@@ -335,12 +337,18 @@ async function djikstra(startNode) {
       
         if (distance < distances[neighborNode.id()]) {
           distances[neighborNode.id()] = distance;
+
+          // grab curr labels
+          var labels = neighborNode.data('labels');
+        
+          labels[labels.length - 1] = 'Distance: ' + distances[neighborNode.id()];
+          neighborNode.data('labels', labels);
           previousNodes[neighborNode.id()] = currentNode.id();
           //console.log(currentNode.id().toString());
           enqueue(neighborNode.id());
         //   edge.style('line-color', 'blue');
           edge.animate({
-            style: { 'line-color': 'red' },
+            style: { 'line-color': 'blue' },
             duration: 1000,
             easing: "ease-in-out"
           });
@@ -352,6 +360,10 @@ async function djikstra(startNode) {
       // console.log(distances);
 
     }
+
+    cy.edges().forEach(function(edge) {
+        edge.removeStyle("line-color");
+    });
   
     // Color the minimum path edges
    // Loop through previousNodes dictionary
@@ -364,9 +376,7 @@ async function djikstra(startNode) {
             edge = cy.edges('[source="' + nodeId + '"][target="' + previousNodeId + '"]');
         }
         
-        cy.edges().forEach(function(edge) {
-            edge.removeStyle("line-color");
-          });
+        
 
         // Apply a style to color the edge
         edge.style('line-color', 'green');
@@ -379,15 +389,15 @@ async function djikstra(startNode) {
         }
     });
     
-    // Update the distance labels
-    cy.nodes().forEach(function(node) {
-      // grab curr labels
-      var labels = node.data('labels');
+    // // Update the distance labels
+    // cy.nodes().forEach(function(node) {
+    //   // grab curr labels
+    //   var labels = node.data('labels');
       
-      labels[labels.length - 1] = 'Distance: ' + distances[node.id()];
-      node.data('labels', labels);
+    //   labels[labels.length - 1] = 'Distance: ' + distances[node.id()];
+    //   node.data('labels', labels);
 
-    });
+    // });
 
     cy.nodes().animate({
         style: { "background-color": 'white' },
