@@ -34,20 +34,19 @@ function randomIP() {
     return ip;
 }
 
+// cytoscape.use(avsdf);
 
 // Init cytoscape
 var cy = cytoscape({
     container: document.getElementById("cy"),
+    wheelSensitivity: 0.25,
     // Merge node and edge list
     elements: nodes.concat(edges),
     layout: {
-        name: "grid",
-        nodeRepulsion: function (node) {
-            return 3000000;
-        },
-        edgeElasticity: function (edge) {
-            return 1000;
-        },
+        name: "avsdf",
+        nodeSeparation: 200,
+        fit: true,
+        padding: 150
     },
     style: [
         {
@@ -182,7 +181,7 @@ function isConnected(cy, node1, node2) {
 var randomize = document.getElementById("randomize");
 randomize.onclick = function () {
   // Randomize a layout with nodes and edges (connected graph)
-  var numNodes = Math.floor(Math.random() * 9) + 4; // Random nodeNum between [4, 12]
+  var numNodes = Math.floor(Math.random() * 7) + 4; // Random nodeNum between [4, 10]
 
   // Nodes and edges to append
   var nodes = [];
@@ -243,13 +242,10 @@ randomize.onclick = function () {
   // Add the generated nodes and edges
   cy.add(nodes.concat(edges));
   cy.layout({
-    name: "grid",
-    nodeRepulsion: function (node) {
-      return 2000000;
-    },
-    edgeElasticity: function (edge) {
-      return 1000;
-    },
+    name: "avsdf",
+    nodeSeparation: 200,
+    fit: true,
+    padding: 150
   }).run();
 };
 
@@ -258,9 +254,8 @@ var start = document.getElementById("start");
 start.onclick = function () {
     // to-do
     const start = cy.nodes()[0];
-    const end = cy.nodes().last();
 
-    djikstra(start, end);
+    djikstra(start);
 };
 const queue = [];
 const distances = {};
