@@ -58,7 +58,7 @@ var cy = cytoscape({
                 width: "50px",
                 height: "50px",
                 "background-clip": "node",
-                shape: "rectangle",
+                shape: "roundrectangle",
                 "background-color": "white",
                 "text-wrap": "wrap",
                 "text-max-width": 140,
@@ -266,7 +266,11 @@ function enqueue(node) {
     queue.sort((a, b) => distances[a] - distances[b]);
 }
 
-function djikstra(startNode) {
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function djikstra(startNode) {
     // Set initial distances and previous nodes
    
     cy.nodes().forEach(function(node) {
@@ -274,6 +278,22 @@ function djikstra(startNode) {
       previousNodes[node.id()] = null;
     });
     distances[startNode.id()] = 0;
+
+    // Update the distance labels
+    cy.nodes().forEach(function(node) {
+        // grab curr labels
+        var labels = node.data('labels');
+        
+        if (!labels[labels.length - 1].includes('Distance:')) {
+          labels.push('Distance: ' + distances[node.id()])
+          node.data('labels', labels);
+        }
+        
+    });
+
+    // // sleep
+    // await sleep(1000); // 1 second sleep
+
 
     
     // Create a priority queue
@@ -288,7 +308,16 @@ function djikstra(startNode) {
     while (!(queue.length == 0)) {
       // Get the node with the smallest distance
       var currentNode = cy.nodes('[id="' + queue.shift() + '"]');
-      currentNode.style('background-color', 'red');
+
+      currentNode.animate({
+        style: { "background-color": 'red' },
+        duration: 1000,
+        easing: "ease-in-out"
+      });
+      
+     // sleep
+     await sleep(1000); // 1 second sleep
+
 
       // Get the neighbors of the current node
       var neighborNodes = currentNode.neighborhood().nodes();
@@ -309,7 +338,12 @@ function djikstra(startNode) {
           previousNodes[neighborNode.id()] = currentNode.id();
           //console.log(currentNode.id().toString());
           enqueue(neighborNode.id());
-           // edge.style('line-color', 'blue');
+        //   edge.style('line-color', 'blue');
+          edge.animate({
+            style: { 'line-color': 'red' },
+            duration: 1000,
+            easing: "ease-in-out"
+          });
         }
 
       });
@@ -321,32 +355,45 @@ function djikstra(startNode) {
   
     // Color the minimum path edges
    // Loop through previousNodes dictionary
-console.log(previousNodes);
-Object.keys(previousNodes).forEach(function(nodeId) {
-    var previousNodeId = previousNodes[nodeId];
-    if (previousNodeId !== null) {
-      // Get the edge connecting the node with its previous node
-      var edge = cy.edges('[source="' + previousNodeId + '"][target="' + nodeId + '"]');
-      if (edge.length === 0) {
-        edge = cy.edges('[source="' + nodeId + '"][target="' + previousNodeId + '"]');
-      }
-      // Apply a style to color the edge
-      edge.style('line-color', 'green');
-      edge.style('arrow-direction', 'backward');
-      edge.style('target-arrow-shape', 'triangle');
-      edge.style('target-arrow-color', 'green');
-    }
-  });
+    Object.keys(previousNodes).forEach(function(nodeId) {
+        var previousNodeId = previousNodes[nodeId];
+        if (previousNodeId !== null) {
+        // Get the edge connecting the node with its previous node
+        var edge = cy.edges('[source="' + previousNodeId + '"][target="' + nodeId + '"]');
+        if (edge.length === 0) {
+            edge = cy.edges('[source="' + nodeId + '"][target="' + previousNodeId + '"]');
+        }
+        
+        cy.edges().forEach(function(edge) {
+            edge.removeStyle("line-color");
+          });
+
+        // Apply a style to color the edge
+        edge.style('line-color', 'green');
+        edge.style('target-arrow-shape', 'triangle');
+        edge.style('target-arrow-color', 'green');
+        
+        
+
+        
+        }
+    });
     
     // Update the distance labels
     cy.nodes().forEach(function(node) {
       // grab curr labels
       var labels = node.data('labels');
       
-      if (!labels[labels.length - 1].includes('Distance:')) {
-        labels.push('Distance: ' + distances[node.id()])
-        node.data('labels', labels);
-      }
-      
+      labels[labels.length - 1] = 'Distance: ' + distances[node.id()];
+      node.data('labels', labels);
+
     });
+
+    cy.nodes().animate({
+        style: { "background-color": 'white' },
+        duration: 1000,
+        easing: "ease-in-out"
+      });
+
+
 }
