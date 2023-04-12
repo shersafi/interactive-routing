@@ -1,11 +1,13 @@
 // Default nodes and edges
+var ips = [randomIP(), randomIP(), randomIP(), randomIP(), randomIP(), randomIP()]
+
 var nodes = [
-  { data: { id: "1", labels: ["IP: " + randomIP(), "ID: 1"] } },
-  { data: { id: "2", labels: ["IP: " + randomIP(), "ID: 2"] } },
-  { data: { id: "3", labels: ["IP: " + randomIP(), "ID: 3"] } },
-  { data: { id: "4", labels: ["IP: " + randomIP(), "ID: 4"] } },
-  { data: { id: "5", labels: ["IP: " + randomIP(), "ID: 5"] } },
-  { data: { id: "6", labels: ["IP: " + randomIP(), "ID: 6"] } },
+  { data: { id: "1", ip: ips[0], labels: ["IP: " + ips[0], "ID: 1"] } },
+  { data: { id: "2", ip: ips[1], labels: ["IP: " + ips[1], "ID: 2"] } },
+  { data: { id: "3", ip: ips[2], labels: ["IP: " + ips[2], "ID: 3"] } },
+  { data: { id: "4", ip: ips[3], labels: ["IP: " + ips[3], "ID: 4"] } },
+  { data: { id: "5", ip: ips[4], labels: ["IP: " + ips[4], "ID: 5"] } },
+  { data: { id: "6", ip: ips[5], labels: ["IP: " + ips[5], "ID: 6"] } },
 ];
 var edges = [
   { data: { id: "edge1", source: "1", target: "2", weight: 2 } },
