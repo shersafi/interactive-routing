@@ -32,7 +32,7 @@
     text-decoration: underline;
 }
 
-#labels {
+label {
     display: inline-block;
     font-family: "OpenSans";
     line-height: 2.5;

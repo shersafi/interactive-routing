@@ -1,5 +1,6 @@
 
 function onCalculateDvs() {
+    clearAlgo()
     dvStart()
 }
 
@@ -13,9 +14,10 @@ function dvShare(cy) {
     cy.nodes().forEach(node => {
         let dv = node.data("dv") ?? {}
         node.connectedEdges().forEach(edge => {
-            dv[otherNode(node, edge).id()] = edge.data("weight")
+            let node2 = otherNode(node, edge).id()
+            dv[node2] = [edge.data("weight"), node2]
         })
-        dv[node.id()] = 0
+        dv[node.id()] = [0, node.id()]
         node.data("dv", dv)
         updateLabel(node)
         animateUpdate(node)
@@ -24,8 +26,6 @@ function dvShare(cy) {
     cy.nodes().forEach(node => {
         node.connectedEdges().forEach(edge => {
             let node2 = otherNode(node, edge)
-
-            //node2.emit("dvUpdate", [node.id(), node.data("dv")])
 
             setTimeout(
                 (n, id, dv) => n.emit("dvUpdate", [id, dv]),
@@ -43,56 +43,63 @@ function otherNode(node, edge) {
     return edge.target()
 }
 
-function dvUpdate({target: to}, newId, newDv) {
-    console.log("dvUpdate", to.data("id"), newId, to.data("dv"), newDv)
+function dvUpdate({ target: node }, neighborId, neighborDv) {
+    //console.log("dvUpdate", node.data("id"), neighborId, node.data("dv"), neighborDv)
 
-    let selfDv = to.data("dv")
+    let dv = node.data("dv")
     let updated = false
 
-    let a = selfDv[newId]
-
-    for (const nodeId in newDv) {
-        let newValue = a + (newDv[nodeId] ?? Infinity)
-        let oldValue = (selfDv[nodeId] ?? Infinity)
+    for (const nodeId in neighborDv) {
+        let oldValue = (dv[nodeId] ?? [Infinity])[0]
+        let newValue = dv[neighborId][0] + (neighborDv[nodeId] ?? [Infinity])[0]
 
         if (newValue < oldValue) {
-            selfDv[nodeId] = newValue
+            dv[nodeId] = [newValue, neighborId]
             updated = true
         }
     }
 
     if (updated) {
-        to.data("dv", selfDv)
-        updateLabel(to)
-        animateUpdate(to)
-        
-        to.connectedEdges().forEach(edge => {
-            let node2 = otherNode(to, edge)
+        node.data("dv", dv)
+        updateLabel(node)
+        animateUpdate(node)
+
+        node.connectedEdges().forEach(edge => {
+            let node2 = otherNode(node, edge)
 
             //node2.emit("dvUpdate", [to.id(), to.data("dv")])
 
             setTimeout(
                 (n, id, dv) => n.emit("dvUpdate", [id, dv]),
                 edge.data("weight") * 200,
-                node2, to.id(), to.data("dv")
+                node2, node.id(), node.data("dv")
             )
         })
     }
-    
-}
 
-function updateLabel(node) {
-    node.data("labels", [`IP: ${node.data("ip")}`, `ID: ${node.id()}`, `Distance Vector:`].concat(Object.entries(node.data("dv")).map(([k, v]) => `${k}: ${v}`)) )
 }
 
 function animateUpdate(node) {
     node.animate({
-        style: { "background-color": "red" }
-      }, {
+        style: { "background-color": "green" }
+    }, {
         duration: 100,
-        complete: function(){
-          node.style("background-color", "white")
+        complete: function () {
+            node.style("background-color", "white")
         },
         queue: false
-      })
+    })
 }
+
+function bfRoute(cy, start, end) {
+    let node = cy.getElementById(start)
+
+    dv = node.data("dv") || {}
+    if (dv[end]) {
+        
+    } else {
+        alert(`Node ${end} is not connected`)
+        return
+    }
+}
+
