@@ -107,14 +107,7 @@ async function djikstra(startNode) {
         var previousNodeId = previousNodes[nodeId];
         if (previousNodeId !== null) {
             // Get the edge connecting the node with its previous node
-            var edge = cy.edges(
-                '[source="' + previousNodeId + '"][target="' + nodeId + '"]'
-            );
-            if (edge.length === 0) {
-                edge = cy.edges(
-                    '[source="' + nodeId + '"][target="' + previousNodeId + '"]'
-                );
-            }
+            let edge = cy.getElementById(edgeId(previousNodeId, nodeId))
 
             // Apply a style to color the edge
             edge.style("line-color", "green");
