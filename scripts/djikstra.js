@@ -119,8 +119,6 @@ async function djikstra(startNode) {
             // Apply a style to color the edge
             edge.style("line-color", "green");
             edge.style("width", 8);
-            edge.style("target-arrow-shape", "triangle");
-            edge.style("target-arrow-color", "green");
         }
     });
 
