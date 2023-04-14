@@ -1,22 +1,26 @@
-let queue = [];
-let distances = {};
-let previousNodes = {};
+let queue = []; // Initialize priority queue object
+let distances = {}; // Holds distances from node to node
+let previousNodes = {}; // Tracks previous node during traversal
 
+// Priority queue append
 function enqueue(node) {
     queue.push(node);
-    queue.sort((a, b) => distances[a] - distances[b]);
+    queue.sort((a, b) => distances[a] - distances[b]); // Sort by distance in the priority queue
 }
 
+// Sleep function that delays each step
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// When "Start Djikstra's" is clicked, start the algorithm
 function onDjikstra() {
     let start = cy.getElementById(cy.data("start"))
-    clearAlgo()
+    clearAlgo() // Clear to ensure no algorithm was applied before
     djikstra(start)
 }
 
+// Djikstra's algorithm implementation
 async function djikstra(startNode) {
     // Set initial distances and previous nodes
     queue = [];
@@ -31,9 +35,10 @@ async function djikstra(startNode) {
 
     // Update the distance labels
     cy.nodes().forEach(function (node) {
-        // grab curr labels
+        // Grab current labels
         var labels = node.data("labels");
 
+        // Initialize distance labels
         if (!labels[labels.length - 1].includes("Distance:")) {
             if (node.id() === startNode.id()) {
                 labels.push("Distance: 0");
@@ -46,9 +51,6 @@ async function djikstra(startNode) {
     });
 
     enqueue(startNode.id());
-
-    //console.log(cy.nodes()[3].neighborhood().nodes().length);
-    //console.log(queue);
 
     // Loop until the queue is empty
     while (!(queue.length == 0)) {
@@ -67,10 +69,6 @@ async function djikstra(startNode) {
         // Get the neighbors of the current node
         var neighborNodes = currentNode.neighborhood().nodes();
 
-        //   neighborNodes.forEach(function(neighborNode) {
-        //     console.log(neighborNode.id());
-        //   });
-
         // Loop through the neighbors
         neighborNodes.forEach(function (neighborNode) {
             var edge = currentNode.edgesWith(neighborNode);
@@ -85,9 +83,7 @@ async function djikstra(startNode) {
                 labels[labels.length - 1] = "Distance: " + distances[neighborNode.id()];
                 neighborNode.data("labels", labels);
                 previousNodes[neighborNode.id()] = currentNode.id();
-                //console.log(currentNode.id().toString());
                 enqueue(neighborNode.id());
-                //   edge.style('line-color', 'blue');
                 edge.animate({
                     style: { "line-color": "blue", "width": 8},
                     duration: 1000,
@@ -97,6 +93,7 @@ async function djikstra(startNode) {
         });
     }
 
+    // Remove blue traversal lines
     cy.edges().forEach(function (edge) {
         edge.removeStyle("line-color");
     });
