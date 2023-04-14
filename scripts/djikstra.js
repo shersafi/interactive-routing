@@ -77,7 +77,7 @@ async function djikstra(startNode) {
             if (distance < distances[neighborNode.id()]) {
                 distances[neighborNode.id()] = distance;
 
-                // grab curr labels
+                // Grab current labels
                 var labels = neighborNode.data("labels");
 
                 labels[labels.length - 1] = "Distance: " + distances[neighborNode.id()];
