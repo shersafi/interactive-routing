@@ -79,7 +79,7 @@ function dvUpdate({ target: node }, neighborId, neighborDv) {
 
 function animateUpdate(node) {
     node.animate({
-        style: { "background-color": "red" }
+        style: { "background-color": "red" },
     }, {
         duration: 100,
         complete: function () {
@@ -114,7 +114,11 @@ function dvRoute(cy, start, end) {
         return
     }
 
-    node.style("background-color", "green")
+    node.animate({
+        style: { "background-color": "green" },
+        duration: 500,
+        easing: "ease-in-out",
+    })
 
     if (start === end) {
         let labels = node.data("labels")
@@ -136,8 +140,11 @@ function dvRoute(cy, start, end) {
 
         setTimeout(() => {
             let edge = cy.getElementById(edgeId(start, hop))
-            edge.style("line-color", "green")
-            edge.style("width", 8)
+            edge.animate({
+                style: { "line-color": "green", "width": 8},
+                duration: 500,
+                easing: "ease-in-out",
+            })
             dvRoute(cy, hop, end)
         }, 1000)
         return
