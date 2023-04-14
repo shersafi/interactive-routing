@@ -11,9 +11,14 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function onDjikstra() {
+    let start = cy.getElementById(cy.data("start"))
+    clearAlgo()
+    djikstra(start)
+}
+
 async function djikstra(startNode) {
     // Set initial distances and previous nodes
-    clearAlgo()
     queue = [];
     distances = {};
     previousNodes = {};
@@ -84,7 +89,7 @@ async function djikstra(startNode) {
                 enqueue(neighborNode.id());
                 //   edge.style('line-color', 'blue');
                 edge.animate({
-                    style: { "line-color": "blue" },
+                    style: { "line-color": "blue", "width": 8},
                     duration: 1000,
                     easing: "ease-in-out",
                 });
@@ -113,6 +118,7 @@ async function djikstra(startNode) {
 
             // Apply a style to color the edge
             edge.style("line-color", "green");
+            edge.style("width", 8);
             edge.style("target-arrow-shape", "triangle");
             edge.style("target-arrow-color", "green");
         }

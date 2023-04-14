@@ -21,30 +21,24 @@
                 2. Click node to connect, delete, set as start, set as end<br>
                 3. Click edge to change weight
             </p>
-            <br>
-            <label>Default layout:</label> <button onclick="onDefault()">Default</button>
-            <br>
-            <label>Clear layout:</label> <button onclick="onClear()">Clear</button>
-            <br>
-            <label>Randomize Layout:</label> <button onclick="onRandomize()">Randomize!</button>
-            <br>
-            <label>Remove selected:</label> <button onclick="onRemove()">Remove</button>
-            <br>
-            <form>
-                <label id="labels" for="algorithms">Select Routing Algorithm:</label>
-                <select name="algorithms" id="algorithms">
-                    <option value="djikstra">Djikstra's</option>
-                    <option value="distributed">Distributed</option>
-                </select>
-            </form>
-            <br>
-            <br>
-            <button id="start">Start Algorithm!</button>
+            <p>
+                <label>Default layout:</label> <button onclick="onDefault()">Default</button><br>
+                <label>Clear layout:</label> <button onclick="onClear()">Clear</button><br>
+                <label>Randomize Layout:</label> <button onclick="onRandomize()">Randomize!</button><br>
+                <label>Remove selected:</label> <button onclick="onRemove()">Remove</button>
+            </p>
 
-            <br>
-            <br>
+            <h3>Djikstra's</h3>
+            <p>
+                <button onclick="onDjikstra()">Start Djikstra's</button>
+            </p>
 
-            <button onclick="onCalculateDvs()">Calculate Distance Vectors</button>
+            <h3>Distributed Routing</h3>
+            <p style="font-size: 16px">
+                1. Calculate distance vectors using Bellman-Ford algorithm: <button onclick="onCalculateDvs()">Calculate</button><br>
+                    *A node flashes red when it shares it's distance vector with it's neighboor nodes.<br><br>
+                2. Start distance vector routing algorithm: <button onclick="onRouteDvs()">Start</button>    
+            </p>
             
         </div>
         <script src="scripts/index.js"></script>

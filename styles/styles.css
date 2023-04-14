@@ -35,11 +35,15 @@
 label {
     display: inline-block;
     font-family: "OpenSans";
-    line-height: 2.5;
+    line-height: 2;
 }
 
 
 #start {
     position: absolute;
     left: 30%; /* i know its ghetto */
+}
+
+button {
+    font-size: 18px;
 }
